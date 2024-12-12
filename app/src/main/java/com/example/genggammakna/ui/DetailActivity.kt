@@ -6,6 +6,7 @@ import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.graphics.YuvImage
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -24,17 +25,16 @@ import java.util.concurrent.Executors
 class DetailActivity : AppCompatActivity() {
 
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var camera: Camera
     private lateinit var binding: ActivityDetailBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
+        enableEdgeToEdge()
 
-        // Initialize layout and camera setup
         initBinding()
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-        // Retrieve intent data and set to UI components
         val title = intent.getStringExtra("title")
         val description = intent.getStringExtra("description")
         val imageResId = intent.getIntExtra("imageResId", -1)
@@ -45,7 +45,6 @@ class DetailActivity : AppCompatActivity() {
             binding.ivImage.setImageResource(imageResId)
         }
 
-        // Start camera preview
         startCamera(binding.previewView)
     }
 
@@ -60,8 +59,7 @@ class DetailActivity : AppCompatActivity() {
             val cameraProvider = cameraProviderFuture.get()
 
             val preview = Preview.Builder().build().apply {
-                // Pastikan previewView sudah tersedia
-                previewView.surfaceProvider
+                setSurfaceProvider(previewView.surfaceProvider)
             }
 
             val imageAnalyzer = ImageAnalysis.Builder()
@@ -69,13 +67,19 @@ class DetailActivity : AppCompatActivity() {
                 .build()
                 .also {
                     it.setAnalyzer(cameraExecutor, { imageProxy ->
-                        processImageProxy(imageProxy)
+                        try {
+                            processImageProxy(imageProxy)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        } finally {
+                            imageProxy.close()
+                        }
                     })
                 }
 
             try {
                 cameraProvider.unbindAll()
-                camera = cameraProvider.bindToLifecycle(
+                cameraProvider.bindToLifecycle(
                     this,
                     CameraSelector.DEFAULT_BACK_CAMERA,
                     preview,
@@ -87,12 +91,9 @@ class DetailActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
-
-    // Inference timing variables
     private var lastInferenceTime = 0L
     private val inferenceDelay = 10L
 
-    // Sentence handling
     private val detectedSentence = StringBuilder()
     private val sentenceUpdateDelay = 2000L
     private var lastUpdateTime = 0L
@@ -102,14 +103,13 @@ class DetailActivity : AppCompatActivity() {
     private fun processImageProxy(imageProxy: ImageProxy) {
         val currentTime = System.currentTimeMillis()
 
-        // Ensure delay between inferences
         if (currentTime - lastInferenceTime < inferenceDelay) {
-            imageProxy.close()
             return
         }
 
         lastInferenceTime = currentTime
-        val bitmap = imageProxy.toBitmapCompat()
+
+        val bitmap = imageProxy.toBitmapCompat() ?: return
         val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, true)
 
         cameraExecutor.execute {
@@ -118,15 +118,12 @@ class DetailActivity : AppCompatActivity() {
                 val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 224, 224, 3), DataType.FLOAT32)
                 inputFeature0.loadBuffer(scaledBitmap.toByteBuffer())
 
-                // Run inference on the model
                 val outputs = model.process(inputFeature0)
                 val probabilities = outputs.outputFeature0AsTensorBuffer.floatArray
 
-                // Determine the detected letter based on maximum probability
                 val maxIndex = probabilities.indices.maxByOrNull { probabilities[it] } ?: -1
                 val detectedLetter = if (maxIndex in alphabet.indices) alphabet[maxIndex] else "?"
 
-                // Update UI with detected letter and sentence
                 runOnUiThread {
                     binding.tvDetectedText.text = detectedLetter.toString()
 
@@ -147,26 +144,36 @@ class DetailActivity : AppCompatActivity() {
                 e.printStackTrace()
             } finally {
                 model.close()
-                imageProxy.close()
             }
         }
     }
 
-    // Helper function to convert ImageProxy to Bitmap
-    private fun ImageProxy.toBitmapCompat(): Bitmap {
-        val yuvImage = YuvImage(planes[0].buffer.toByteArray(), ImageFormat.NV21, width, height, null)
-        val out = ByteArrayOutputStream()
-        yuvImage.compressToJpeg(Rect(0, 0, width, height), 100, out)
-        return BitmapFactory.decodeByteArray(out.toByteArray(), 0, out.size())
+    private fun ImageProxy.toBitmapCompat(): Bitmap? {
+        return try {
+            val yBuffer = planes[0].buffer
+            val uBuffer = planes[1].buffer
+            val vBuffer = planes[2].buffer
+
+            val ySize = yBuffer.remaining()
+            val uSize = uBuffer.remaining()
+            val vSize = vBuffer.remaining()
+
+            val nv21 = ByteArray(ySize + uSize + vSize)
+            yBuffer.get(nv21, 0, ySize)
+            vBuffer.get(nv21, ySize, vSize)
+            uBuffer.get(nv21, ySize + vSize, uSize)
+
+            val yuvImage = YuvImage(nv21, ImageFormat.NV21, width, height, null)
+            val out = ByteArrayOutputStream()
+            yuvImage.compressToJpeg(Rect(0, 0, width, height), 100, out)
+            val imageBytes = out.toByteArray()
+            BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
-    // Helper function to convert ByteBuffer to ByteArray
-    private fun ByteBuffer.toByteArray(): ByteArray {
-        rewind()
-        return ByteArray(remaining()).also { get(it) }
-    }
-
-    // Helper function to convert Bitmap to ByteBuffer for model input
     private fun Bitmap.toByteBuffer(): ByteBuffer {
         val byteBuffer = ByteBuffer.allocateDirect(4 * 224 * 224 * 3)
         byteBuffer.order(ByteOrder.nativeOrder())
@@ -174,9 +181,9 @@ class DetailActivity : AppCompatActivity() {
         val intValues = IntArray(224 * 224)
         getPixels(intValues, 0, 224, 0, 0, 224, 224)
         for (pixel in intValues) {
-            byteBuffer.putFloat(((pixel shr 16) and 0xFF) / 255.0f) // R
-            byteBuffer.putFloat(((pixel shr 8) and 0xFF) / 255.0f)  // G
-            byteBuffer.putFloat((pixel and 0xFF) / 255.0f) // B
+            byteBuffer.putFloat(((pixel shr 16) and 0xFF) / 255.0f)
+            byteBuffer.putFloat(((pixel shr 8) and 0xFF) / 255.0f)
+            byteBuffer.putFloat((pixel and 0xFF) / 255.0f)
         }
         return byteBuffer
     }

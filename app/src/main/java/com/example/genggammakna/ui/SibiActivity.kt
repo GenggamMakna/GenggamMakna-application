@@ -3,6 +3,7 @@ package com.example.genggammakna.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import com.example.genggammakna.R
@@ -12,6 +13,8 @@ class SibiActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sibi)
+        supportActionBar?.hide()
+        enableEdgeToEdge()
 
         //cardA <> cardZ
         val cardIds = ('A'..'Z').map { letter ->

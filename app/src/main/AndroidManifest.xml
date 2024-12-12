@@ -35,6 +35,8 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+        <activity android:name=".ui.SibiActivity"
+            android:exported="false"/>
         <activity
             android:name=".SplashScreen"
             android:exported="true">
