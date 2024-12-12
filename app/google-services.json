@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "715915668390",
+    "firebase_url": "https://genggammakna-9b9c2-default-rtdb.firebaseio.com",
+    "project_id": "genggammakna-9b9c2",
+    "storage_bucket": "genggammakna-9b9c2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:715915668390:android:f524310c2cf5ff6b8b3d67",
+        "android_client_info": {
+          "package_name": "com.example.genggammakna"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-JSvtrQqWr4PahGsIQn2KgxZGiNpSVFQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

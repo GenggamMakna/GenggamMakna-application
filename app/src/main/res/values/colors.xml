@@ -8,5 +8,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#001F54</color>
-    <color name="light_blue">#1F6FCC</color>"
+    <color name="light_blue">#1F6FCC</color>
+    <color name="cardBackgroundColor">#FFFFFF</color>
+    <color name="colorPrimary">#FF5722</color>
 </resources>

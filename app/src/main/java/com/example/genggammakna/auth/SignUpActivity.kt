@@ -1,77 +1,84 @@
 package com.example.genggammakna.auth
 
+
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.genggammakna.R
-import com.google.android.material.textfield.TextInputEditText
+import com.example.genggammakna.databinding.ActivitySignUpBinding
+import com.example.genggammakna.repository.ResultState
+import com.example.genggammakna.viewmodel.SignUpViewModel
+
 
 class SignUpActivity : AppCompatActivity() {
+    private lateinit var binding: ActivitySignUpBinding
+    private val viewModel: SignUpViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        contentViewInitBinding()
+        registerBtnViewModel()
+        redirectLogin()
+    }
+    private fun contentViewInitBinding(){
         supportActionBar?.hide()
         enableEdgeToEdge()
-        setContentView(R.layout.activity_sign_up)
-
-        val nameEditText = findViewById<TextInputEditText>(R.id.editTextTextName)
-        val emailEditText = findViewById<TextInputEditText>(R.id.editTextTextEmailAddress)
-        val passwordEditText = findViewById<TextInputEditText>(R.id.editTextTextPassword)
-        val confirmPasswordEditText = findViewById<TextInputEditText>(R.id.editTextTextConfirmPassword)
-        val signUpButton = findViewById<Button>(R.id.tvButtonSignIn)
-
-        val signInButton = findViewById<Button>(R.id.btnSignIn)
-        signInButton.setOnClickListener {
-            finish()
+        binding = ActivitySignUpBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+    }
+    private fun registerBtnViewModel(){
+        binding.tvButtonSignUp.setOnClickListener {
+            registerUser()
         }
-
-        signUpButton.setOnClickListener {
-            val name = nameEditText.text.toString().trim()
-            val email = emailEditText.text.toString().trim()
-            val password = passwordEditText.text.toString().trim()
-            val confirmPassword = confirmPasswordEditText.text.toString().trim()
-
-            nameEditText.error = null
-            emailEditText.error = null
-            passwordEditText.error = null
-            confirmPasswordEditText.error = null
-
-            var isValid = true
-
-            if (name.isEmpty()) {
-                nameEditText.error = "Nama harus diisi"
-                isValid = false
-            }
-            if (email.isEmpty()) {
-                emailEditText.error = "Email harus diisi"
-                isValid = false
-            } else if (!isValidEmail(email)) {
-                emailEditText.error = "Email tidak valid"
-                isValid = false
-            }
-            if (password.isEmpty()) {
-                passwordEditText.error = "Password harus diisi"
-                isValid = false
-            } else if (password.length < 8) {
-                passwordEditText.error = "Password minimal 8 karakter"
-                isValid = false
-            }
-            if (confirmPassword.isEmpty()) {
-                confirmPasswordEditText.error = "Konfirmasi password harus diisi"
-                isValid = false
-            } else if (password != confirmPassword) {
-                confirmPasswordEditText.error = "Konfirmasi password tidak sama"
-                isValid = false
-            }
-            if (isValid) {
-                Toast.makeText(this, "Pendaftaran berhasil!", Toast.LENGTH_SHORT).show()
+        observeViewModel()
+    }
+    private fun observeViewModel() {
+        viewModel.registerResult.observe(this) { result ->
+            when (result) {
+                is ResultState.Loading -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                }
+                is ResultState.Success -> {
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(this, result.data, Toast.LENGTH_SHORT).show()
+                }
+                is ResultState.Error -> {
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(this, result.error, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
 
-    private fun isValidEmail(email: String): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    private fun registerUser() {
+        binding.apply {
+            val firstname = editTextTextNameFirst.text.toString()
+            val lastname = editTextTextNameLast.text.toString()
+            val email = editTextTextEmailAddress.text.toString()
+            val password = editTextTextPassword.text.toString()
+            val confirmPassword = editTextTextConfirmPassword.text.toString()
+
+            if (listOf(firstname, lastname, email, password, confirmPassword).all { it.isNotEmpty() }) {
+                if (password == confirmPassword) {
+                    viewModel.registerUser(firstname, lastname, email, password)
+                } else {
+                    Toast.makeText(this@SignUpActivity, "Password tidak cocok", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(this@SignUpActivity, "Mohon isi semua kolom pendaftaran", Toast.LENGTH_SHORT).show()
+            }
+
+        }
+    }
+    private fun redirectLogin(){
+        val signInButton = findViewById<Button>(R.id.btnSignInUser)
+        signInButton.setOnClickListener {
+            finish()
+        }
     }
 }

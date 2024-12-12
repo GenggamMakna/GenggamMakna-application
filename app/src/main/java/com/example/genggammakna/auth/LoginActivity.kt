@@ -1,70 +1,127 @@
 package com.example.genggammakna.auth
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.WindowInsets
+import android.view.WindowManager
 import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.genggammakna.MainActivity
 import com.example.genggammakna.R
+import com.example.genggammakna.databinding.ActivityLoginBinding
+import com.example.genggammakna.preferences.UserPreferences
+import com.example.genggammakna.repository.ResultState
+import com.example.genggammakna.repository.UserModel
+import com.example.genggammakna.viewmodel.LoginViewModel
+
 
 class LoginActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityLoginBinding
+    private lateinit var emailEdt: EdEdtEmail
+    private lateinit var edtTxt: EdtTextPassword
+
+    private val viewModel: LoginViewModel by viewModels()
+    private lateinit var userPreferences: UserPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        supportActionBar?.hide()
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_login)
+        userPreferences = UserPreferences(this)
+        initBinding()
+        setView()
+        initPreferences()
+        edtText()
+        navSignUp()
+        loginBtnViewModel()
+        observeViewModel()
+    }
 
-        val lupaPasswordButton = findViewById<Button>(R.id.textView3)
-        lupaPasswordButton.setOnClickListener {
-            Toast.makeText(this, "Tombol Lupa Password ditekan", Toast.LENGTH_SHORT).show()
+    private fun initBinding() {
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+    }
+
+    private fun initPreferences() {
+        userPreferences = UserPreferences(this)
+    }
+
+    private fun edtText() {
+        emailEdt = binding.editTextTextEmailAddress
+        edtTxt = binding.editTextTextPassword
+    }
+
+    private fun setView() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.hide(WindowInsets.Type.statusBars())
+        } else {
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+            )
         }
+        supportActionBar?.hide()
+    }
 
+    private fun navSignUp() {
         val signUpButton = findViewById<Button>(R.id.btnSignUp)
         signUpButton.setOnClickListener {
             val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
         }
+    }
 
-        val signInButton = findViewById<Button>(R.id.tvButtonSignIn)
-        val emailEditText = findViewById<EditText>(R.id.editTextTextEmailAddress)
-        val passwordEditText = findViewById<EditText>(R.id.editTextTextPassword)
+    private fun loginBtnViewModel() {
+        binding.tvButtonSignIn.setOnClickListener {
+            loginUser()
+        }
+    }
 
-        signInButton.setOnClickListener {
-            val email = emailEditText.text.toString()
-            val password = passwordEditText.text.toString()
-
-            emailEditText.error = null
-            passwordEditText.error = null
-
-            var isValid = true
-
-            if (email.isEmpty()) {
-                emailEditText.error = "Email tidak boleh kosong"
-                isValid = false
-            } else if (!isValidEmail(email)) {
-                emailEditText.error = "Email tidak valid"
-                isValid = false
-            }
-            if (password.isEmpty()) {
-                passwordEditText.error = "Password tidak boleh kosong"
-                isValid = false
-            } else if (password.length < 8) {
-                passwordEditText.error = "Password minimal 8 karakter"
-                isValid = false
-            }
-            if (isValid) {
-                Toast.makeText(this, "Sign in berhasil! test", Toast.LENGTH_SHORT).show()
-                // val intent = Intent(this, MainActivity::class.java)
-                // startActivity(intent)
+    private fun observeViewModel() {
+        viewModel.loginResult.observe(this) { result ->
+            when (result) {
+                is ResultState.Loading -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                }
+                is ResultState.Success -> {
+                    binding.progressBar.visibility = View.INVISIBLE
+                    Toast.makeText(this, result.data, Toast.LENGTH_SHORT).show()
+                    navToMainActivity()
+                }
+                is ResultState.Error -> {
+                    binding.progressBar.visibility = View.INVISIBLE
+                    Toast.makeText(this, result.error, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
 
-    // Fungsi untuk memvalidasi email
-    private fun isValidEmail(email: String): Boolean {
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+
+
+    private fun saveUserSession(user: UserModel?) {
+        if (user != null) {
+            userPreferences.saveUser(user)
+        }
+    }
+
+    private fun navToMainActivity() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish() // Tutup LoginActivity setelah berhasil login
+    }
+
+    private fun loginUser() {
+        binding.apply {
+            val email = binding.editTextTextEmailAddress.text.toString()
+            val password = binding.editTextTextPassword.text.toString()
+
+            if (email.isNotEmpty() && password.isNotEmpty()) {
+                viewModel.loginUser(email, password)
+            } else {
+                Toast.makeText(this@LoginActivity, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

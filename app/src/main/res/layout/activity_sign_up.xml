@@ -8,7 +8,7 @@
     tools:context=".auth.SignUpActivity">
 
     <TextView
-        android:id="@+id/tvSignIn"
+        android:id="@+id/tvSignUp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="80dp"
@@ -22,20 +22,20 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputName"
+        android:id="@+id/textInputNameFirst"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="316dp"
         android:layout_height="82dp"
-        android:layout_marginTop="40dp"
-        android:hint="@string/name"
+        android:layout_marginTop="20dp"
+        android:hint="@string/nama_awal"
         android:textColorHint="@color/white"
         app:boxBackgroundMode="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvSignIn">
+        app:layout_constraintTop_toBottomOf="@id/tvSignUp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editTextTextName"
+            android:id="@+id/editTextTextNameFirst"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_edittext_background"
@@ -43,7 +43,31 @@
             android:inputType="textEmailAddress"
             android:textColor="@android:color/black"
             android:textColorHint="@android:color/black"
-            app:layout_constraintTop_toBottomOf="@id/tvSignIn"/>
+            app:layout_constraintTop_toBottomOf="@id/tvSignUp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputNameLast"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="316dp"
+        android:layout_height="78dp"
+        android:hint="@string/nama_akhir"
+        android:textColorHint="@color/white"
+        app:boxBackgroundMode="none"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textInputNameFirst">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextTextNameLast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_edittext_background"
+            android:fontFamily="@font/poppins_regular"
+            android:inputType="textEmailAddress"
+            android:textColor="@android:color/black"
+            android:textColorHint="@android:color/black"
+            app:layout_constraintTop_toBottomOf="@id/textInputNameFirst"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -51,16 +75,14 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="316dp"
         android:layout_height="82dp"
-        android:layout_marginTop="12dp"
-        android:hint="@string/email"
         android:textColorHint="@color/white"
         app:boxBackgroundMode="none"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textInputName">
+        app:layout_constraintTop_toBottomOf="@id/textInputNameLast">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <com.example.genggammakna.auth.EdEdtEmail
             android:id="@+id/editTextTextEmailAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -71,19 +93,28 @@
             android:textColorHint="@android:color/black" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible"/>
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputPassword"
         android:layout_width="317dp"
         android:layout_height="78dp"
-        android:layout_marginTop="16dp"
-        android:hint="@string/password"
         android:textColorHint="@color/white"
         app:boxBackgroundMode="outline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textInputEmail">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <com.example.genggammakna.auth.EdtTextPassword
             android:id="@+id/editTextTextPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -98,15 +129,13 @@
         android:id="@+id/textInputConfirmPassword"
         android:layout_width="317dp"
         android:layout_height="78dp"
-        android:layout_marginTop="16dp"
-        android:hint="@string/confirm_password"
         android:textColorHint="@color/white"
         app:boxBackgroundMode="outline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textInputPassword">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <com.example.genggammakna.auth.EditTextConfirmPassword
             android:id="@+id/editTextTextConfirmPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -119,7 +148,7 @@
 
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/tvButtonSignIn"
+        android:id="@+id/tvButtonSignUp"
         android:layout_width="316dp"
         android:layout_height="62dp"
         android:layout_marginTop="24dp"
@@ -138,7 +167,7 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tvButtonSignIn"
+        app:layout_constraintTop_toBottomOf="@id/tvButtonSignUp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -152,7 +181,7 @@
             android:textSize="16sp" />
 
         <Button
-            android:id="@+id/btnSignIn"
+            android:id="@+id/btnSignInUser"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sign_in"

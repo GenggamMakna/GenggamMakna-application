@@ -11,4 +11,16 @@
     <string name="name">Nama</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="sudah_punya_akun">Sudah Punya Akun?</string>
+    <string name="nama_akhir">Last Name</string>
+    <string name="nama_awal">First Name</string>
+
+    <!--    hardcoded-->
+    <string name="enter_your_email">Enter your email</string>
+    <string name="invalid_email_address">Invalid email address</string>
+    <string name="enter_your_password">Enter your password</string>
+    <string name="password_must_be_at_least_8_characters">Password must be at least 8 characters</string>
+    <string name="passwords_do_not_match">Password do not Match</string>
+    <string name="confirm_your_password">Confirm your Password</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
