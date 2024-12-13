@@ -9,6 +9,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.genggammakna.R
+import com.example.genggammakna.preferences.UserPreferences
+import com.example.genggammakna.repository.UserModel
 
 class SettingsFragment : Fragment() {
     @SuppressLint("SetTextI18n")
@@ -18,11 +20,22 @@ class SettingsFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
 
-        val username = "user"
+        // Inisialisasi UserPreferences
+        val userPreferences = UserPreferences(requireContext())
+        val user = userPreferences.getUser()
 
+        // Tentukan username
+        val username = if (user != null) {
+            "${user.firstname} ${user.lastname}"
+        } else {
+            "User"
+        }
+
+        // Set username ke TextView
         val tvGreeting = view.findViewById<TextView>(R.id.tvGreeting)
         tvGreeting.text = "Hi, $username"
 
+        // Setup tombol
         view.findViewById<View>(R.id.btnProfile).setOnClickListener {
             Toast.makeText(requireContext(), "Open Profile clicked", Toast.LENGTH_SHORT).show()
         }

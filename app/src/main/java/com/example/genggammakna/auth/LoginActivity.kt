@@ -8,6 +8,7 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.genggammakna.MainActivity
@@ -30,6 +31,15 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userPreferences = UserPreferences(this)
+        if (userPreferences.getUser() == null) {
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
+        supportActionBar?.hide()
+        enableEdgeToEdge()
+        initBinding()
         initBinding()
         setView()
         initPreferences()
@@ -88,6 +98,9 @@ class LoginActivity : AppCompatActivity() {
                 is ResultState.Success -> {
                     binding.progressBar.visibility = View.INVISIBLE
                     Toast.makeText(this, result.data, Toast.LENGTH_SHORT).show()
+
+                    val user = UserModel("Firstname", "Lastname", "Email") // Data user yang diperoleh dari ViewModel
+                    saveUserSession(user)
                     navToMainActivity()
                 }
                 is ResultState.Error -> {
@@ -97,9 +110,6 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
-
-
-
     private fun saveUserSession(user: UserModel?) {
         if (user != null) {
             userPreferences.saveUser(user)

@@ -20,7 +20,7 @@ class UserPreferences(private val context: Context) {
     fun saveUser(user: UserModel) {
         with(sharedPreferences.edit()) {
             putString("firstname", user.firstname)
-            putString("lastname", user.lastname) // Tambahkan penyimpanan lastname
+            putString("lastname", user.lastname)
             putString("email", user.email)
             apply()
         }
