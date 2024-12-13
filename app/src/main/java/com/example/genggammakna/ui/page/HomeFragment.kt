@@ -21,7 +21,6 @@ class HomeFragment : Fragment() {
             val intent = Intent(requireContext(), UploadActivity::class.java)
             startActivity(intent)
         }
-
         return view
     }
 }
