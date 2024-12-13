@@ -15,7 +15,7 @@
 ### Technologies Used:
 - **Android SDK**: The app is developed for Android devices.
 - **Machine Learning**: To process sign language recognition and translation.
-- **Firebase**: For storing user data and app configurations.
+- **Google Cloud and firebase**: For storing user data and app configurations.
 
 ### Installation Instructions:
 
