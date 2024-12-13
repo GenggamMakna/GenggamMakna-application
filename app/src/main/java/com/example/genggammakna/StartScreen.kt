@@ -17,6 +17,7 @@ class StartScreen : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_start_screen)
+
         userPreferences = UserPreferences(this)
         val currentUser = userPreferences.getUser()
         if (currentUser != null) {

@@ -31,18 +31,16 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userPreferences = UserPreferences(this)
-        if (userPreferences.getUser() == null) {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
-            finish()
+        val user = userPreferences.getUser()
+        if (user != null) {
+
+            navToMainActivity()
             return
         }
         supportActionBar?.hide()
         enableEdgeToEdge()
         initBinding()
-        initBinding()
         setView()
-        initPreferences()
         edtText()
         navSignUp()
         loginBtnViewModel()
@@ -52,10 +50,6 @@ class LoginActivity : AppCompatActivity() {
     private fun initBinding() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-    }
-
-    private fun initPreferences() {
-        userPreferences = UserPreferences(this)
     }
 
     private fun edtText() {
@@ -110,6 +104,7 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun saveUserSession(user: UserModel?) {
         if (user != null) {
             userPreferences.saveUser(user)
@@ -135,3 +130,4 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 }
+
