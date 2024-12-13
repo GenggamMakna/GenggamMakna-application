@@ -5,24 +5,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.fragment.app.Fragment
 import com.example.genggammakna.R
-import com.example.genggammakna.ui.SibiActivity
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class HomeFragment : Fragment() {
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        val buttonSibi: Button = view.findViewById(R.id.buttonSibi)
-        buttonSibi.setOnClickListener {
-            startActivity(Intent(activity, SibiActivity::class.java))
+        val fabAdd: FloatingActionButton = view.findViewById(R.id.fabAdd)
+        fabAdd.setOnClickListener {
+            val intent = Intent(requireContext(), UploadActivity::class.java)
+            startActivity(intent)
         }
+
         return view
     }
-
 }

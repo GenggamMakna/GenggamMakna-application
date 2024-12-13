@@ -15,7 +15,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.example.genggammakna.databinding.ActivityMainBinding
 import com.example.genggammakna.preferences.UserPreferences
-import com.example.genggammakna.ui.CameraxActivity
+import com.example.genggammakna.ui.page.CameraxFragment
 import com.example.genggammakna.ui.page.HomeFragment
 import com.example.genggammakna.ui.page.SettingsFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_camera -> {
-                    replaceActivity(CameraxActivity::class.java)
+                    replaceFragment(CameraxFragment())
                     true
                 }
                 R.id.nav_settings -> {
@@ -74,12 +74,6 @@ class MainActivity : AppCompatActivity() {
     private fun initBinding() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-    }
-
-
-    private fun replaceActivity(targetActivity: Class<*>) {
-        val intent = Intent(this, targetActivity)
-        startActivity(intent)
     }
 
     private fun replaceFragment(fragment: Fragment) {

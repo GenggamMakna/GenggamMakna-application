@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+
     <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -18,10 +20,7 @@
         android:theme="@style/Theme.GenggamMakna"
         tools:targetApi="31">
         <activity
-            android:name=".ui.CameraxActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.DetailActivity"
+            android:name=".ui.page.UploadActivity"
             android:exported="false" />
         <activity
             android:name=".auth.SignUpActivity"
@@ -35,8 +34,6 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
-        <activity android:name=".ui.SibiActivity"
-            android:exported="false"/>
         <activity
             android:name=".SplashScreen"
             android:exported="true">

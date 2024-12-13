@@ -1,18 +1,21 @@
-package com.example.genggammakna.ui
+package com.example.genggammakna.ui.page
 
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.example.genggammakna.R
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.graphics.YuvImage
-import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
-import com.example.genggammakna.databinding.ActivityDetailBinding
+import com.example.genggammakna.databinding.FragmentCameraxBinding
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.ByteArrayOutputStream
@@ -22,39 +25,28 @@ import java.nio.ByteOrder
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class DetailActivity : AppCompatActivity() {
-
+class CameraxFragment : Fragment() {
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var binding: ActivityDetailBinding
+    private lateinit var binding: FragmentCameraxBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        supportActionBar?.hide()
-        enableEdgeToEdge()
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentCameraxBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        initBinding()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         cameraExecutor = Executors.newSingleThreadExecutor()
-
-        val title = intent.getStringExtra("title")
-        val description = intent.getStringExtra("description")
-        val imageResId = intent.getIntExtra("imageResId", -1)
-
-        binding.tvTitle.text = title
-        binding.tvDescription.text = description
-        if (imageResId != -1) {
-            binding.ivImage.setImageResource(imageResId)
-        }
 
         startCamera(binding.previewView)
     }
 
-    private fun initBinding() {
-        binding = ActivityDetailBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-    }
-
     private fun startCamera(previewView: PreviewView) {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
 
@@ -80,7 +72,7 @@ class DetailActivity : AppCompatActivity() {
             try {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(
-                    this,
+                    viewLifecycleOwner,  // Using viewLifecycleOwner for fragments
                     CameraSelector.DEFAULT_BACK_CAMERA,
                     preview,
                     imageAnalyzer
@@ -88,7 +80,7 @@ class DetailActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-        }, ContextCompat.getMainExecutor(this))
+        }, ContextCompat.getMainExecutor(requireContext()))
     }
 
     private var lastInferenceTime = 0L
@@ -113,7 +105,7 @@ class DetailActivity : AppCompatActivity() {
         val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, true)
 
         cameraExecutor.execute {
-            val model = Modelslfinal.newInstance(this)
+            val model = Modelslfinal.newInstance(requireContext())
             try {
                 val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 224, 224, 3), DataType.FLOAT32)
                 inputFeature0.loadBuffer(scaledBitmap.toByteBuffer())
@@ -124,9 +116,7 @@ class DetailActivity : AppCompatActivity() {
                 val maxIndex = probabilities.indices.maxByOrNull { probabilities[it] } ?: -1
                 val detectedLetter = if (maxIndex in alphabet.indices) alphabet[maxIndex] else "?"
 
-                runOnUiThread {
-                    binding.tvDetectedText.text = detectedLetter.toString()
-
+                requireActivity().runOnUiThread {
                     if (detectedLetter != "?") {
                         detectedSentence.append(detectedLetter)
                     }
@@ -188,8 +178,8 @@ class DetailActivity : AppCompatActivity() {
         return byteBuffer
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         cameraExecutor.shutdown()
     }
 }

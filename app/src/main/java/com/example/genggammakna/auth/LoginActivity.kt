@@ -109,7 +109,7 @@ class LoginActivity : AppCompatActivity() {
     private fun navToMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
-        finish() // Tutup LoginActivity setelah berhasil login
+        finish()
     }
 
     private fun loginUser() {

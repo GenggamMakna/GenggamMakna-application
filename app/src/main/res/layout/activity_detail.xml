@@ -4,9 +4,9 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
     android:padding="16dp"
-    tools:context=".ui.DetailActivity">
+    android:background="@drawable/gradient_background"
+    tools:context=".ui.CameraxActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
